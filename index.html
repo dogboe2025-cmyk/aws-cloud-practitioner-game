@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AWS Cloud Practitioner Essentials — Study Game</title>
+<style>
+:root{--navy:#102a43;--blue:#1769aa;--green:#16856b;--gold:#f4b942;--bg:#f3f7fb;--ink:#183247}
+*{box-sizing:border-box}body{margin:0;font-family:Arial,Helvetica,sans-serif;background:linear-gradient(135deg,#eaf3fb,#f7fbf8);color:var(--ink)}
+header{background:var(--navy);color:white;padding:26px 18px;text-align:center;border-bottom:5px solid var(--gold)}
+header h1{margin:0 0 8px;font-size:clamp(1.5rem,4vw,2.3rem)}header p{margin:0;color:#d9e8f5}
+main{max-width:850px;margin:25px auto;padding:0 14px}.panel{background:white;border-radius:16px;padding:24px;box-shadow:0 8px 26px #17324d18}
+.row{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;color:#486276;font-size:.95rem}
+.progress{height:9px;background:#e6edf3;border-radius:20px;margin:15px 0 22px;overflow:hidden}.bar{height:100%;background:var(--green);width:0;transition:width .2s}
+h2{font-size:1.35rem;line-height:1.4}.answers{display:grid;gap:10px;margin:20px 0}.answers button{background:#f8fafc;color:var(--ink);border:2px solid #d6e1ea;border-radius:10px;text-align:left;padding:14px;font-size:1rem;cursor:pointer}.answers button:hover:not(:disabled){border-color:var(--blue);background:#edf6ff}.answers button.correct{border-color:#16856b;background:#e6f7f1}.answers button.wrong{border-color:#c84b4b;background:#fff0f0}
+.feedback{padding:13px;border-radius:10px;margin:14px 0;line-height:1.5}.feedback.good{background:#e6f7f1}.feedback.bad{background:#fff0f0}
+.controls{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px} .primary,.secondary{border:0;border-radius:9px;padding:12px 18px;font-size:1rem;cursor:pointer}.primary{background:var(--blue);color:white}.secondary{background:#e6edf3;color:var(--navy)}button:disabled{opacity:.55;cursor:not-allowed}
+.small{font-size:.88rem;color:#61788a;line-height:1.5}.hidden{display:none}.score{font-size:2.5rem;color:var(--green);font-weight:bold}.pill{display:inline-block;background:#e6f7f1;color:#11644f;border-radius:30px;padding:5px 10px;font-size:.85rem}
+footer{text-align:center;color:#60788b;padding:22px;font-size:.85rem}
+</style>
+</head>
+<body>
+<header><h1>AWS Cloud Practitioner Essentials</h1><p>Interactive study game • 30 multiple-choice questions</p></header>
+<main><section class="panel" id="intro">
+<span class="pill">Study • Practice • Improve</span>
+<h2>Welcome to the AWS Cloud Study Challenge</h2>
+<p>Answer 30 questions about AWS compute, storage, databases, networking, security, billing, and support services.</p>
+<ul><li>Choose one answer for each question.</li><li>Read the explanation after answering.</li><li>Your score is shown at the end.</li><li>You can restart and practice again.</li></ul>
+<p class="small">This is an independent study aid for exam preparation, not an official AWS exam.</p>
+<button class="primary" onclick="startGame()">Start game</button>
+</section>
+<section class="panel hidden" id="game">
+<div class="row"><span id="counter">Question 1 of 30</span><span id="scoreLabel">Score: 0</span></div>
+<div class="progress"><div class="bar" id="bar"></div></div>
+<h2 id="question"></h2><div class="answers" id="answers"></div><div id="feedback" class="hidden"></div>
+<div class="controls"><button class="primary" id="next" onclick="nextQuestion()" disabled>Next question</button><button class="secondary" onclick="quitGame()">Restart</button></div>
+</section>
+<section class="panel hidden" id="results">
+<h2>Game complete!</h2><p>Your final score:</p><div class="score" id="finalScore"></div><p id="resultMessage"></p>
+<div class="controls"><button class="primary" onclick="startGame()">Play again</button><button class="secondary" onclick="showReview()">Review answers</button></div><div id="review" class="hidden"></div>
+</section></main><footer>Created as a learning resource for IT335 • AWS Cloud Practitioner Essentials</footer>
+<script>
+const questions = [
+{q:"Which AWS service provides resizable virtual servers in the cloud?",a:["Amazon S3","Amazon EC2","Amazon RDS","AWS Organizations"],c:1,e:"Amazon EC2 provides virtual server instances for running workloads."},
+{q:"Which AWS service is designed for object storage?",a:["Amazon EBS","Amazon EC2","Amazon S3","Amazon VPC"],c:2,e:"Amazon S3 stores objects such as files, images, backups, and data archives in buckets."},
+{q:"Which service provides managed relational databases?",a:["Amazon RDS","Amazon CloudFront","AWS Lambda","Amazon Route 53"],c:0,e:"Amazon RDS simplifies setup, operation, and scaling of relational databases."},
+{q:"What is the main purpose of an Amazon VPC?",a:["Create a private virtual network in AWS","Manage employee payroll","Store source code only","Replace IAM"],c:0,e:"A VPC lets you define a logically isolated network, including IP ranges and subnets."},
+{q:"What is an AWS Availability Zone?",a:["A billing account","One or more discrete data centers in a Region","A type of IAM user","A content delivery cache"],c:1,e:"Availability Zones are isolated locations within an AWS Region, designed to support high availability."},
+{q:"Which AWS service runs code without requiring you to manage servers?",a:["AWS Lambda","Amazon EBS","AWS Direct Connect","Amazon EC2 only"],c:0,e:"AWS Lambda is a serverless compute service that runs code in response to events."},
+{q:"Which service distributes content to users with low latency using edge locations?",a:["Amazon CloudFront","Amazon RDS","AWS IAM","Amazon EBS"],c:0,e:"Amazon CloudFront is AWS's content delivery network (CDN)."},
+{q:"Which AWS service translates domain names to IP addresses and routes DNS queries?",a:["Amazon Route 53","Amazon EFS","AWS Shield","Amazon Inspector"],c:0,e:"Amazon Route 53 is a scalable DNS and domain-routing service."},
+{q:"What does IAM help you manage?",a:["Identity and access permissions","Object storage classes","Physical data center cooling","Database query syntax"],c:0,e:"AWS Identity and Access Management controls who can access AWS resources and what they can do."},
+{q:"What is the recommended security principle of least privilege?",a:["Give everyone administrator access","Grant only the permissions needed to do a task","Share root credentials","Disable logging"],c:1,e:"Least privilege reduces risk by granting only the access required for a task."},
+{q:"Which service helps protect applications against distributed denial-of-service attacks?",a:["AWS Shield","Amazon Athena","AWS Glue","Amazon ECR"],c:0,e:"AWS Shield provides managed DDoS protection for applications running on AWS."},
+{q:"Which service records account activity and API calls for auditing?",a:["AWS CloudTrail","Amazon CloudFront","Amazon EBS","AWS Budgets"],c:0,e:"AWS CloudTrail records AWS account activity and API events for governance, compliance, and auditing."},
+{q:"Which service monitors metrics, logs, and alarms for AWS resources?",a:["Amazon CloudWatch","AWS Artifact","Amazon Route 53","AWS Snowball"],c:0,e:"Amazon CloudWatch collects and monitors metrics and logs and can trigger alarms."},
+{q:"Which service provides recommendations about cost optimization, security, performance, and service limits?",a:["AWS Trusted Advisor","AWS Lambda","Amazon S3 Glacier only","Amazon VPC"],c:0,e:"AWS Trusted Advisor checks your environment and provides recommendations across several best-practice categories."},
+{q:"Which AWS service helps estimate and track planned spending with alerts?",a:["AWS Budgets","AWS Shield","Amazon EFS","AWS WAF"],c:0,e:"AWS Budgets lets you set cost or usage budgets and configure alerts."},
+{q:"Which purchasing option is generally suitable for fault-tolerant workloads with flexible start and end times at lower prices?",a:["On-Demand Instances only","Spot Instances","Dedicated Hosts only","Reserved IP addresses"],c:1,e:"Spot Instances use spare EC2 capacity at discounts, but AWS can interrupt them."},
+{q:"What is an advantage of using Auto Scaling with EC2?",a:["It automatically adjusts capacity to demand","It removes all security requirements","It converts every database to NoSQL","It eliminates all AWS charges"],c:0,e:"EC2 Auto Scaling can add or remove instances to meet demand and maintain desired capacity."},
+{q:"What does an Elastic Load Balancer do?",a:["Distributes incoming traffic across targets","Encrypts every file on a laptop","Creates IAM passwords","Stores database backups only"],c:0,e:"Elastic Load Balancing distributes incoming application traffic across multiple targets."},
+{q:"Which service provides block-level storage volumes for EC2 instances?",a:["Amazon EBS","Amazon S3","Amazon Route 53","AWS Organizations"],c:0,e:"Amazon Elastic Block Store provides persistent block storage volumes for EC2."},
+{q:"Which service provides scalable shared file storage for Linux workloads?",a:["Amazon EFS","Amazon SQS","AWS CloudTrail","Amazon CloudFront"],c:0,e:"Amazon Elastic File System offers elastic, shared file storage commonly used with Linux instances."},
+{q:"Which feature can help prevent public access to an S3 bucket?",a:["S3 Block Public Access","EC2 Auto Scaling","Route 53 health checks","CloudWatch dashboards"],c:0,e:"S3 Block Public Access provides settings that help prevent unintended public exposure."},
+{q:"Which AWS database is a managed NoSQL key-value and document database?",a:["Amazon DynamoDB","Amazon RDS for MySQL","Amazon Redshift","Amazon EBS"],c:0,e:"Amazon DynamoDB is a managed NoSQL database service."},
+{q:"Which service is designed for data warehousing and analytical queries?",a:["Amazon Redshift","Amazon Route 53","AWS Shield","Amazon EC2 key pairs"],c:0,e:"Amazon Redshift is a cloud data warehouse for analytics."},
+{q:"Which service helps migrate databases to AWS with minimal downtime?",a:["AWS Database Migration Service (DMS)","AWS WAF","Amazon CloudFront","AWS Budgets"],c:0,e:"AWS DMS supports database migration to AWS and between database platforms."},
+{q:"What is the purpose of a public subnet in a VPC?",a:["It can route traffic to an internet gateway","It guarantees all instances are private","It replaces security groups","It is a database engine"],c:0,e:"A subnet is considered public when its route table provides a route to an internet gateway; resources still need suitable addressing and rules."},
+{q:"What do security groups act as for AWS resources such as EC2 instances?",a:["Virtual firewalls controlling inbound and outbound traffic","A tool for forecasting budgets","A global DNS registry","A storage archive tier"],c:0,e:"Security groups control allowed inbound and outbound traffic at the resource's network interface."},
+{q:"Which service provides a dedicated private network connection from an organization to AWS?",a:["AWS Direct Connect","Amazon S3","AWS Lambda","AWS Artifact"],c:0,e:"AWS Direct Connect establishes a dedicated network connection from a location to AWS."},
+{q:"What is the AWS shared responsibility model?",a:["AWS and the customer have different security responsibilities","AWS handles every customer security task","Customers manage AWS physical data centers","Security is optional for cloud services"],c:0,e:"AWS is responsible for security of the cloud; customers are responsible for security in the cloud, with details varying by service."},
+{q:"Which service gives customers access to AWS compliance reports and agreements?",a:["AWS Artifact","Amazon EC2","Amazon EFS","AWS Lambda"],c:0,e:"AWS Artifact provides on-demand access to AWS security and compliance reports and certain agreements."},
+{q:"What is a benefit of using multiple Availability Zones for a workload?",a:["Improved resilience if one zone has a problem","Guaranteed zero cost","No need for backups","Automatic permission for public access"],c:0,e:"Deploying across multiple Availability Zones can improve availability and fault tolerance."}
+];
+let order=[],idx=0,score=0,answered=false,history=[];
+function startGame(){order=questions.map((_,i)=>i).sort(()=>Math.random()-.5);idx=0;score=0;history=[];document.getElementById('intro').classList.add('hidden');document.getElementById('results').classList.add('hidden');document.getElementById('game').classList.remove('hidden');renderQuestion();}
+function renderQuestion(){answered=false;const q=questions[order[idx]];document.getElementById('counter').textContent=`Question ${idx+1} of ${order.length}`;document.getElementById('scoreLabel').textContent=`Score: ${score}`;document.getElementById('bar').style.width=`${idx/order.length*100}%`;document.getElementById('question').textContent=q.q;document.getElementById('answers').innerHTML='';document.getElementById('feedback').className='hidden';document.getElementById('feedback').textContent='';document.getElementById('next').disabled=true;document.getElementById('next').textContent=idx===order.length-1?'See results':'Next question';q.a.forEach((ans,i)=>{const b=document.createElement('button');b.textContent=String.fromCharCode(65+i)+'. '+ans;b.onclick=()=>choose(i,b);document.getElementById('answers').appendChild(b);});}
+function choose(choice,btn){if(answered)return;answered=true;const q=questions[order[idx]],buttons=[...document.querySelectorAll('#answers button')];buttons.forEach((b,i)=>{b.disabled=true;if(i===q.c)b.classList.add('correct');});let good=choice===q.c;if(good){score++;btn.classList.add('correct')}else btn.classList.add('wrong');history.push({question:q.q,chosen:q.a[choice],correct:q.a[q.c],good,explanation:q.e});const f=document.getElementById('feedback');f.className='feedback '+(good?'good':'bad');f.innerHTML=`<strong>${good?'Correct!':'Not quite.'}</strong> ${q.e}`;document.getElementById('scoreLabel').textContent=`Score: ${score}`;document.getElementById('next').disabled=false;}
+function nextQuestion(){if(!answered)return;idx++;if(idx>=order.length){document.getElementById('game').classList.add('hidden');document.getElementById('results').classList.remove('hidden');document.getElementById('bar').style.width='100%';document.getElementById('finalScore').textContent=`${score} / ${questions.length} (${Math.round(score/questions.length*100)}%)`;document.getElementById('resultMessage').textContent=score>=27?'Excellent work! Keep reviewing to retain what you learned.':score>=21?'Good effort. Review the explanations for the questions you missed.':'Keep practicing. Review the explanations and try again.';document.getElementById('review').classList.add('hidden');}else renderQuestion();}
+function quitGame(){if(confirm('Restart the game? Your current progress will be lost.'))startGame();}
+function showReview(){const el=document.getElementById('review');el.classList.toggle('hidden');if(!el.classList.contains('hidden')){el.innerHTML='<h3>Answer review</h3>'+history.map((h,i)=>`<p><strong>${i+1}. ${h.question}</strong><br>${h.good?'✓':'✗'} Your answer: ${h.chosen}<br><strong>Correct answer:</strong> ${h.correct}<br><span class="small">${h.explanation}</span></p>`).join('');}}
+</script></body></html>
